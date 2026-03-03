@@ -69,7 +69,8 @@
     .download-btn { display: inline-block; background: var(--accent); color: #fff; text-decoration: none; border-radius: 10px; padding: 10px 14px; font-weight: 600; font-size: 14px; }
     .download-id { color: var(--muted); font-size: 13px; }
     .global-counter { margin: 4px 0 16px; }
-    .global-counter img { height: 24px; width: auto; border-radius: 6px; }
+    .global-counter { color: var(--muted); font-size: 14px; }
+    .global-counter strong { color: #dbe9ff; }
     code {
       background: #0e1320;
       border: 1px solid #273248;
@@ -116,7 +117,7 @@
         </div>
       </div>
       <div class="global-counter">
-        <img id="visitBadge" src="" alt="Page visits" />
+        <span id="counterLabel">Unique visits:</span> <strong id="counterValue">...</strong>
       </div>
 
       <section data-lang="en">
@@ -255,40 +256,30 @@
     </div>
   </div>
 
-  <script>
+    <script>
     (function () {
-      var KEY = 'afina_support_lang';
+      var LANG_KEY = 'afina_support_lang';
+      var VISIT_KEY = 'afina_support_unique_hit_sent_v2';
       var fallback = 'en';
-      var saved = localStorage.getItem(KEY);
+      var saved = localStorage.getItem(LANG_KEY);
       var current = saved === 'ru' || saved === 'en' || saved === 'uk' ? saved : fallback;
 
       var sections = Array.prototype.slice.call(document.querySelectorAll('[data-lang]'));
       var buttons = Array.prototype.slice.call(document.querySelectorAll('[data-switch]'));
 
-      // One shared counter badge.
-      // unique_per_browser: increments once per browser/device using localStorage flag.
-      var COUNTER_KEY = 'afina_support_unique_hit_sent_v1';
-      var firstUnique = !localStorage.getItem(COUNTER_KEY);
-      if (firstUnique) {
-        localStorage.setItem(COUNTER_KEY, '1');
-      }
-
-      function setBadge(lang) {
+      function setCounterLabel(lang) {
         var labels = {
-          en: 'unique%20visits',
-          uk: '%D1%83%D0%BD%D1%96%D0%BA%D0%B0%D0%BB%D1%8C%D0%BD%D1%96%20%D0%B2%D1%96%D0%B4%D0%B2%D1%96%D0%B4%D1%83%D0%B2%D0%B0%D0%BD%D0%BD%D1%8F',
-          ru: '%D1%83%D0%BD%D0%B8%D0%BA%D0%B0%D0%BB%D1%8C%D0%BD%D1%8B%D0%B5%20%D0%B2%D0%B8%D0%B7%D0%B8%D1%82%D1%8B'
+          en: 'Unique visits:',
+          uk: 'Унікальні відвідування:',
+          ru: 'Уникальные визиты:'
         };
-        // For repeat opens in same browser, use nop-count endpoint (extraCount=0 and cache-bust)
-        var base = 'https://hits.sh/uwsolution.github.io/afina-vault-support.svg';
-        var q = '?label=' + (labels[lang] || labels.en) + '&extraCount=' + (firstUnique ? '1' : '0') + '&color=2d8cff&ts=' + Date.now();
-        var img = document.getElementById('visitBadge');
-        if (img) img.src = base + q;
+        var node = document.getElementById('counterLabel');
+        if (node) node.textContent = labels[lang] || labels.en;
       }
 
       function apply(lang) {
         current = lang;
-        localStorage.setItem(KEY, lang);
+        localStorage.setItem(LANG_KEY, lang);
         sections.forEach(function (node) {
           node.classList.toggle('show', node.getAttribute('data-lang') === lang);
         });
@@ -298,7 +289,34 @@
           btn.setAttribute('aria-selected', active ? 'true' : 'false');
         });
         document.documentElement.lang = lang;
-        setBadge(lang);
+        setCounterLabel(lang);
+      }
+
+      function loadCounter() {
+        var firstUnique = !localStorage.getItem(VISIT_KEY);
+        var hitUrl = 'https://abacus.jasoncameron.dev/hit/afina-vault-support/main-page-unique';
+        var getUrl = 'https://abacus.jasoncameron.dev/get/afina-vault-support/main-page-unique';
+
+        var hitPromise = firstUnique
+          ? fetch(hitUrl, { cache: 'no-store' })
+              .then(function (r) { return r.json(); })
+              .then(function () { localStorage.setItem(VISIT_KEY, '1'); })
+              .catch(function () {})
+          : Promise.resolve();
+
+        hitPromise.then(function () {
+          return fetch(getUrl, { cache: 'no-store' })
+            .then(function (r) { return r.json(); })
+            .then(function (data) {
+              var value = (data && typeof data.value === 'number') ? String(data.value) : 'n/a';
+              var v = document.getElementById('counterValue');
+              if (v) v.textContent = value;
+            })
+            .catch(function () {
+              var v = document.getElementById('counterValue');
+              if (v) v.textContent = 'n/a';
+            });
+        });
       }
 
       buttons.forEach(function (btn) {
@@ -308,6 +326,7 @@
       });
 
       apply(current);
+      loadCounter();
     })();
   </script>
 </body>
