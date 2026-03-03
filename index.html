@@ -106,6 +106,7 @@
       <div class="topbar">
         <div class="lang-switch" role="tablist" aria-label="Language switcher">
           <button class="lang-btn" data-switch="en" role="tab" aria-selected="true">EN</button>
+          <button class="lang-btn" data-switch="uk" role="tab" aria-selected="false">UK</button>
           <button class="lang-btn" data-switch="ru" role="tab" aria-selected="false">RU</button>
         </div>
       </div>
@@ -148,6 +149,46 @@
 
         <h2>Privacy</h2>
         <p>Afina Vault stores encrypted data locally on your device. The app is designed for offline use and does not require account sign-in.</p>
+      </section>
+
+      <section data-lang="uk">
+        <h1>Afina Vault — Підтримка</h1>
+        <p>Afina Vault — локальне офлайн-сховище для резервних ключів і секретів на вашому пристрої.</p>
+
+        <h2>Як працює застосунок</h2>
+        <ul>
+          <li><strong>Створіть головний PIN:</strong> під час першого запуску задайте пароль/PIN (не забудьте його).</li>
+          <li><strong>Вхід у сховище:</strong> щоразу вводьте PIN для розблокування.</li>
+          <li><strong>Скидання сховища:</strong> кнопка <code>Reset Vault</code> видаляє всі локальні дані.</li>
+          <li><strong>Додавання секретів:</strong> вручну, через QR-сканер або імпортом Multi-QR.</li>
+          <li><strong>Шифрування і збереження:</strong> кнопка <code>Encrypt &amp; Save</code> зберігає запис у зашифрованому вигляді.</li>
+          <li><strong>Керування ключами:</strong> розшифрування, видалення, експорт Multi-QR і завантаження секрету у <code>.txt</code>.</li>
+        </ul>
+
+        <h3>Скріншоти застосунку</h3>
+        <div class="shot-grid">
+          <div class="shot">
+            <img src="./assets/screenshot-unlock.png" alt="Екран входу в сховище" />
+            <p>Екран входу: поле PIN, кнопка Unlock, кнопка Reset Vault.</p>
+          </div>
+          <div class="shot">
+            <img src="./assets/screenshot-add.png" alt="Екран додавання ключа" />
+            <p>Екран додавання: Scan QR, Import Multi-QR, Encrypt &amp; Save, Export Multi-QR.</p>
+          </div>
+          <div class="shot">
+            <img src="./assets/screenshot-keys.png" alt="Екран списку ключів" />
+            <p>Екран ключів: розшифрування, видалення і завантаження .txt.</p>
+          </div>
+        </div>
+
+        <h2>Як отримати допомогу</h2>
+        <ul>
+          <li>Створіть issue на GitHub: <a href="https://github.com/uwsolution/afina-vault-support/issues">github.com/uwsolution/afina-vault-support/issues</a></li>
+          <li>Вкажіть модель пристрою, версію ОС, версію застосунку та короткий опис проблеми.</li>
+        </ul>
+
+        <h2>Приватність</h2>
+        <p>Afina Vault зберігає дані локально у зашифрованому вигляді. Застосунок не потребує входу в акаунт.</p>
       </section>
 
       <section data-lang="ru">
@@ -199,7 +240,7 @@
       var KEY = 'afina_support_lang';
       var fallback = 'en';
       var saved = localStorage.getItem(KEY);
-      var current = saved === 'ru' || saved === 'en' ? saved : fallback;
+      var current = saved === 'ru' || saved === 'en' || saved === 'uk' ? saved : fallback;
 
       var sections = Array.prototype.slice.call(document.querySelectorAll('[data-lang]'));
       var buttons = Array.prototype.slice.call(document.querySelectorAll('[data-switch]'));
