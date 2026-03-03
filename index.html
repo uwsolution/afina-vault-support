@@ -68,8 +68,8 @@
     .download-wrap { margin: 8px 0 14px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
     .download-btn { display: inline-block; background: var(--accent); color: #fff; text-decoration: none; border-radius: 10px; padding: 10px 14px; font-weight: 600; font-size: 14px; }
     .download-id { color: var(--muted); font-size: 13px; }
-    .visit-counter { margin: 6px 0 12px; color: var(--muted); font-size: 13px; }
-    .visit-counter .visits-value { color: #dbe9ff; font-weight: 600; }
+    .visit-counter { margin: 8px 0 14px; }
+    .visit-counter img { height: 24px; width: auto; border-radius: 6px; }
     code {
       background: #0e1320;
       border: 1px solid #273248;
@@ -123,7 +123,7 @@
                   <span class="download-id">App ID: 6759757812</span>
                 </div>
         <p>Afina Vault is a local, offline vault for storing backup keys and sensitive secrets on your device.</p>
-        <p class="visit-counter">Page visits: <span class="visits-value">loading…</span></p>
+        <p class="visit-counter"><img src="https://hits.sh/uwsolution.github.io/afina-vault-support.svg?label=page%20visits&extraCount=0&color=2d8cff" alt="Page visits counter" /></p>
 
         <h2>How the app works</h2>
         <ul>
@@ -168,7 +168,7 @@
                   <span class="download-id">App ID: 6759757812</span>
                 </div>
         <p>Afina Vault — локальне офлайн-сховище для резервних ключів і секретів на вашому пристрої.</p>
-        <p class="visit-counter">Відвідувань сторінки: <span class="visits-value">loading…</span></p>
+        <p class="visit-counter"><img src="https://hits.sh/uwsolution.github.io/afina-vault-support.svg?label=%D0%B2%D1%96%D0%B4%D0%B2%D1%96%D0%B4%D1%83%D0%B2%D0%B0%D0%BD%D0%BD%D1%8F&extraCount=0&color=2d8cff" alt="Лічильник відвідувань" /></p>
 
         <h2>Як працює застосунок</h2>
         <ul>
@@ -213,7 +213,7 @@
                   <span class="download-id">App ID: 6759757812</span>
                 </div>
         <p>Afina Vault — локальное офлайн-хранилище для резервных ключей и секретов на устройстве.</p>
-        <p class="visit-counter">Посещений страницы: <span class="visits-value">loading…</span></p>
+        <p class="visit-counter"><img src="https://hits.sh/uwsolution.github.io/afina-vault-support.svg?label=%D0%BF%D0%BE%D1%81%D0%B5%D1%89%D0%B5%D0%BD%D0%B8%D1%8F&extraCount=0&color=2d8cff" alt="Счетчик посещений" /></p>
 
         <h2>Как работает приложение</h2>
         <ul>
@@ -284,19 +284,6 @@
           apply(btn.getAttribute('data-switch'));
         });
       });
-
-      // Lightweight public page counter (increments on each load)
-      fetch('https://api.countapi.xyz/hit/afina-vault-support/main-page')
-        .then(function (r) { return r.json(); })
-        .then(function (data) {
-          var value = (data && typeof data.value === 'number') ? String(data.value) : 'n/a';
-          var nodes = document.querySelectorAll('.visits-value');
-          nodes.forEach(function (n) { n.textContent = value; });
-        })
-        .catch(function () {
-          var nodes = document.querySelectorAll('.visits-value');
-          nodes.forEach(function (n) { n.textContent = 'n/a'; });
-        });
 
       apply(current);
     })();
