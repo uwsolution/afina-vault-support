@@ -352,15 +352,29 @@
         setCounterLabel(lang);
       }
 
+      function hasVisitFlag() {
+        try {
+          if (localStorage.getItem(VISIT_KEY)) return true;
+        } catch (e) {}
+        return document.cookie.indexOf(VISIT_KEY + '=1') !== -1;
+      }
+
+      function setVisitFlag() {
+        try { localStorage.setItem(VISIT_KEY, '1'); } catch (e) {}
+        document.cookie = VISIT_KEY + '=1; Max-Age=31536000; Path=/; SameSite=Lax';
+      }
+
       function loadCounter() {
-        var firstUnique = !localStorage.getItem(VISIT_KEY);
+        var firstUnique = !hasVisitFlag();
         var hitUrl = 'https://abacus.jasoncameron.dev/hit/afina-vault-support/main-page-unique';
         var getUrl = 'https://abacus.jasoncameron.dev/get/afina-vault-support/main-page-unique';
+
+        // Set marker before network request to avoid repeat +1 on refresh.
+        if (firstUnique) setVisitFlag();
 
         var hitPromise = firstUnique
           ? fetch(hitUrl, { cache: 'no-store' })
               .then(function (r) { return r.json(); })
-              .then(function () { localStorage.setItem(VISIT_KEY, '1'); })
               .catch(function () {})
           : Promise.resolve();
 
