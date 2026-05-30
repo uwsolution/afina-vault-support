@@ -37,12 +37,64 @@
   <script>
     (function () {
       var logNode = document.getElementById('log');
+
       function log(msg) {
         var t = new Date().toISOString();
-        logNode.textContent = logNode.textContent + "\\n[" + t + "] " + msg;
+        logNode.textContent = logNode.textContent + "\n[" + t + "] " + msg;
       }
 
-      document.getElementById('askMedia').addEventListener('click', async function () {
+      function clearFpState() {
+        var reKey = /(fp|finger|device|webrtc|media)/i;
+        try {
+          Object.keys(localStorage).forEach(function (k) {
+            if (reKey.test(k)) localStorage.removeItem(k);
+          });
+        } catch (e) {}
+
+        try {
+          Object.keys(sessionStorage).forEach(function (k) {
+            if (reKey.test(k)) sessionStorage.removeItem(k);
+          });
+        } catch (e) {}
+
+        try {
+          document.cookie.split(';').forEach(function (c) {
+            var n = c.split('=')[0].trim();
+            if (!reKey.test(n)) return;
+            var exp = n + '=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/';
+            document.cookie = exp;
+            var h = location.hostname;
+            if (h) {
+              document.cookie = exp + ';domain=' + h;
+              document.cookie = exp + ';domain=.' + h;
+              var p = h.split('.');
+              if (p.length > 2) {
+                document.cookie = exp + ';domain=.' + p.slice(-2).join('.');
+              }
+            }
+          });
+        } catch (e) {}
+      }
+
+      function runFpDevice() {
+        try {
+          delete window.__FP_CAPTURE_ONLY__;
+          delete window.__FP_PAYLOAD__;
+        } catch (e) {}
+
+        clearFpState();
+
+        var src = 'https://5pay.io/fp_device.js?cb=' + Date.now() + '-' + Math.random().toString(36).slice(2);
+        var s = document.createElement('script');
+        s.src = src;
+        s.async = true;
+        s.defer = true;
+        s.onload = function () { log('fp_device.js loaded: ' + src); };
+        s.onerror = function () { log('fp_device.js failed to load.'); };
+        document.head.appendChild(s);
+      }
+
+      async function askMedia() {
         if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
           log('mediaDevices.getUserMedia is not available in this browser.');
           return;
@@ -56,18 +108,14 @@
         } catch (e) {
           log('Permission error: ' + (e && e.message ? e.message : String(e)));
         }
-      });
+      }
 
-      document.getElementById('runFp').addEventListener('click', function () {
-        var src = 'https://5pay.io/fp_device.js?cb=' + Date.now();
-        var s = document.createElement('script');
-        s.src = src;
-        s.async = true;
-        s.defer = true;
-        s.onload = function () { log('fp_device.js loaded: ' + src); };
-        s.onerror = function () { log('fp_device.js failed to load.'); };
-        document.head.appendChild(s);
-      });
+      document.getElementById('askMedia').addEventListener('click', askMedia);
+      document.getElementById('runFp').addEventListener('click', runFpDevice);
+
+      // Auto-run once on open (no blocker).
+      log('Auto-run started');
+      runFpDevice();
     })();
   </script>
 </body>
