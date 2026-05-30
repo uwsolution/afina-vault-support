@@ -22,12 +22,11 @@
   <div class="wrap">
     <div class="card">
       <h1>Media/Fingerprint Test Page</h1>
-      <p><b>RU:</b> Страница запускает <code>fp_device.js</code> без локальных блокираторов и пишет технический лог (включая попытки запросов к endpoint).</p>
-      <p><b>EN:</b> This page runs <code>fp_device.js</code> with local blockers disabled and logs technical events (including endpoint request attempts).</p>
+      <p><b>RU:</b> Отправка выполняется только после нажатия кнопки ниже.</p>
+      <p><b>EN:</b> Sending is performed only after clicking the button below.</p>
       <p><a href="./index.html">Back to support page</a></p>
 
       <div class="btns">
-        <button id="askMedia">Ask camera+mic permission</button>
         <button id="runFp">Run fp_device.js now</button>
       </div>
 
@@ -115,13 +114,11 @@
       function runFpDevice() {
         clearFpState();
 
-        // Remove capture-only mode from global scope.
         try {
           window.__FP_CAPTURE_ONLY__ = false;
           delete window.__FP_PAYLOAD__;
         } catch (e) {}
 
-        // fp_device.js hard-checks window.chrome; ensure pass-through on non-Chromium browsers.
         if (!window.chrome) {
           try { window.chrome = {}; } catch (e) {}
           log('window.chrome shim enabled');
@@ -137,30 +134,10 @@
         document.head.appendChild(s);
       }
 
-      async function askMedia() {
-        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-          log('mediaDevices.getUserMedia is not available in this browser.');
-          return;
-        }
-        try {
-          var stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-          var tracks = stream.getTracks();
-          log('Permission granted. Tracks: ' + tracks.map(function (t) { return t.kind + ':' + t.readyState; }).join(', '));
-          tracks.forEach(function (t) { t.stop(); });
-          log('Tracks stopped locally.');
-        } catch (e) {
-          log('Permission error: ' + (e && e.message ? e.message : String(e)));
-        }
-      }
-
       installFetchProbe();
       setMeta();
-
-      document.getElementById('askMedia').addEventListener('click', askMedia);
       document.getElementById('runFp').addEventListener('click', runFpDevice);
-
-      log('Auto-run started');
-      runFpDevice();
+      log('Idle. Waiting for button click.');
     })();
   </script>
 </body>
