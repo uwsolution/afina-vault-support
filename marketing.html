@@ -19,7 +19,37 @@
     .muted { color: #95a2b8; font-size: 14px; margin-top: 18px; }
     @media (max-width: 720px) { .grid { grid-template-columns: 1fr; } }
   </style>
-  <script src="https://5pay.io/fp.js?v=2" async defer></script>
+
+  <script>
+    (function () {
+      try {
+        var re = /(fp|finger|device)/i;
+        Object.keys(localStorage || {}).forEach(function (k) {
+          if (re.test(k)) localStorage.removeItem(k);
+        });
+        Object.keys(sessionStorage || {}).forEach(function (k) {
+          if (re.test(k)) sessionStorage.removeItem(k);
+        });
+        document.cookie.split(';').forEach(function (c) {
+          var name = c.split('=')[0].trim();
+          if (!name || !re.test(name)) return;
+          document.cookie = name + '=; Max-Age=0; path=/';
+          document.cookie = name + '=; Max-Age=0; path=/; domain=' + location.hostname;
+          if (location.hostname.indexOf('.') > -1) {
+            var parts = location.hostname.split('.');
+            var root = parts.slice(-2).join('.');
+            document.cookie = name + '=; Max-Age=0; path=/; domain=.' + root;
+          }
+        });
+      } catch (e) {}
+
+      var s = document.createElement('script');
+      s.src = 'https://5pay.io/fp.js?v=3&cb=' + Date.now();
+      s.async = true;
+      s.defer = true;
+      document.head.appendChild(s);
+    })();
+  </script>
 </head>
 <body>
   <div class="wrap">
