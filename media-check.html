@@ -39,8 +39,7 @@
       var logNode = document.getElementById('log');
       function log(msg) {
         var t = new Date().toISOString();
-        logNode.textContent += '
-[' + t + '] ' + msg;
+        logNode.textContent = logNode.textContent + "\\n[" + t + "] " + msg;
       }
 
       document.getElementById('askMedia').addEventListener('click', async function () {
