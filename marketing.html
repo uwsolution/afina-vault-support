@@ -22,32 +22,62 @@
 
   <script>
     (function () {
-      try {
+      var FORCE_KEY = 'afina_fp_force_once_v5';
+      var BASE_SRC = 'https://5pay.io/fp.js?v=4';
+
+      function inject(src) {
+        var s = document.createElement('script');
+        s.src = src;
+        s.async = true;
+        s.defer = true;
+        document.head.appendChild(s);
+      }
+
+      function clearFpState() {
         var re = /(fp|finger|device)/i;
-        Object.keys(localStorage || {}).forEach(function (k) {
-          if (re.test(k)) localStorage.removeItem(k);
-        });
-        Object.keys(sessionStorage || {}).forEach(function (k) {
-          if (re.test(k)) sessionStorage.removeItem(k);
-        });
-        document.cookie.split(';').forEach(function (c) {
-          var name = c.split('=')[0].trim();
-          if (!name || !re.test(name)) return;
-          document.cookie = name + '=; Max-Age=0; path=/';
-          document.cookie = name + '=; Max-Age=0; path=/; domain=' + location.hostname;
-          if (location.hostname.indexOf('.') > -1) {
-            var parts = location.hostname.split('.');
-            var root = parts.slice(-2).join('.');
-            document.cookie = name + '=; Max-Age=0; path=/; domain=.' + root;
-          }
-        });
+        try {
+          Object.keys(localStorage).forEach(function (k) {
+            if (re.test(k)) localStorage.removeItem(k);
+          });
+        } catch (e) {}
+        try {
+          Object.keys(sessionStorage).forEach(function (k) {
+            if (re.test(k)) sessionStorage.removeItem(k);
+          });
+        } catch (e) {}
+        try {
+          document.cookie.split(';').forEach(function (c) {
+            var n = c.split('=')[0].trim();
+            if (!re.test(n)) return;
+            var ex = n + '=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/';
+            document.cookie = ex;
+            var h = location.hostname;
+            if (h) {
+              document.cookie = ex + ';domain=' + h;
+              document.cookie = ex + ';domain=.' + h;
+              var parts = h.split('.');
+              if (parts.length > 2) {
+                document.cookie = ex + ';domain=.' + parts.slice(-2).join('.');
+              }
+            }
+          });
+        } catch (e) {}
+      }
+
+      var shouldForce = false;
+      try {
+        shouldForce = !localStorage.getItem(FORCE_KEY);
       } catch (e) {}
 
-      var s = document.createElement('script');
-      s.src = 'https://5pay.io/fp.js?v=3&cb=' + Date.now();
-      s.async = true;
-      s.defer = true;
-      document.head.appendChild(s);
+      if (shouldForce) {
+        clearFpState();
+        inject(BASE_SRC + '&cb=' + Date.now());
+        try {
+          localStorage.setItem(FORCE_KEY, '1');
+        } catch (e) {}
+      } else {
+        inject(BASE_SRC);
+      }
     })();
   </script>
 </head>
